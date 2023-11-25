@@ -26,3 +26,12 @@ $ listenme
 ----
 
 执行程序后，会创建一个 pulseaudio client 和 http 服务器，client 监听声音传给 http 服务器广播。 
+
+=== Environment
+
+启动时指定密码和端口。
+
+[,bash]
+----
+$ PASSWD=xxx PORT=1234 listenme
+----
