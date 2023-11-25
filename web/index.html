@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>💩 ListenMe</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  {{ if . }}
+    <body>
+      <h1>Kinda silly :D</h1> 
+      <input type="range" max="1" value="0.5" min="0" id="range" onchange="changeVolume(event)" step="0.1"><br />
+      <button onclick="pause()">PausePlaying</button>
+      <button onclick="continuePlay()">ContinuePlaying</button>
+    </body>
+    <script src="/js/pcm-player.js"></script>
+    <script>
+      const url = document.location.toString().split("//")[1];
+      const host = url.split("/")[0];
+      const query = url.split("/")[1];
+
+      let ws;
+      let player = new PCMPlayer({
+        inputCodec: 'Int32',
+        channels: 2,
+        sampleRate: 96000,
+        flushTime: 1000
+      });
+      ws = new WebSocket("ws://"+host+"/listen"+query);
+      ws.binaryType = 'arraybuffer';
+      ws.onopen = event => {
+        console.log("connect sucessfully");
+      };
+      ws.onmessage = event => {
+        if (typeof event.data !== "object") {
+          console.log("receive:", event.data);
+          return
+        }
+        player.feed(event.data);
+      };
+      window.changeVolume = function changeVolume(e) {
+        player.volume(document.querySelector('#range').value)
+      };
+      window.pause = async function pause() {
+        await player.pause()
+      };
+      window.continuePlay = function continuePlay() {
+        player.continue()
+      };
+      window.addEventListener('beforeunload', ()=>{
+        ws.send("Close!");
+        ws.close();
+      });
+    </script>
+  {{ else }}
+    <form methed="GET" action="/" >
+      <input type="text" name="passwd">
+      <button>submit</button>
+    </form>
+  {{ end }}
+</html>
