@@ -13,42 +13,8 @@ import (
 
 	"github.com/jfreymuth/pulse"
 	"github.com/jfreymuth/pulse/proto"
-	"github.com/noisetorch/pulseaudio"
 )
 
-var moduleId uint32
-
-const moduleName = "listenme"
-
-func initf() {
-	mName := os.Getenv("MODULE_NAME")
-	if mName == "" {
-		mName = moduleName
-	}
-	c, err := pulseaudio.NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer c.Close()
-	idx, err := c.LoadModule(mName, "sink_name="+mName+"Sink")
-	if err != nil {
-		log.Fatal(err)
-	}
-	moduleId = idx
-}
-
-func findModuleSink(c *pulse.Client) *pulse.Sink {
-	sinks, err := c.ListSinks()
-	if err != nil {
-		log.Fatal(fmt.Errorf("get sink list:  %w", err))
-	}
-	for _, s := range sinks {
-		if s.Name() == moduleName+"Sink" {
-			return s
-		}
-	}
-	return nil
-}
 
 func genRandomPasswd(k int) (ret string) {
   rand.Seed(time.Now().Unix())
@@ -85,9 +51,7 @@ func main() {
 	defer client.Close()
 
 	recordOpts := make([]pulse.RecordOption, 0)
-	// s := findModuleSink(client)
-	// if s != nil {
-	// }
+
 	sampleRate := 96000
 	recordOpts = append(recordOpts,
 		pulse.RecordSampleRate(sampleRate),
