@@ -1,8 +1,10 @@
 package main
 
 import (
+	"embed"
 	"html/template"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -117,18 +119,23 @@ func audioServer(sampleRate int, audio io.Reader) {
 	}
 }
 
+//go:embed web
+var web embed.FS
+
 func startServer(sampleRate int, audio io.Reader, passwd string) {
 	go audioServer(sampleRate, audio)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		t, err := template.ParseFiles("web/index.html")
+		t, err := template.ParseFS(web, "web/index.html")
+      // ParseFiles("web/index.html")
 		if err != nil {
 			log.Fatal(err)
 		}
 		pswd := r.URL.Query().Get("passwd")
 		t.Execute(w, pswd == passwd)
 	})
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("web/js"))))
+  subWeb, _ := fs.Sub(web, "web")
+	http.Handle("/js/", http.FileServer(http.FS(subWeb)))
 	http.HandleFunc("/listen", serverStream(sampleRate, audio, passwd))
 	log.Fatal(http.ListenAndServe(":"+serverPort, nil))
 }

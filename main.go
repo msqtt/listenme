@@ -72,7 +72,7 @@ func main() {
 	}
 
   ip := getIP()
-  log.Println("serve at:", fmt.Sprintf("http://%s:%s?passwd=%s", ip, serverPort, passwd))
+  log.Println("serve at:", fmt.Sprintf("http://%s:%s/?passwd=%s", ip, serverPort, passwd))
 
 	go startServer(sampleRate, &buf, passwd)
 
