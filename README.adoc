@@ -1,0 +1,28 @@
+= listenme
+一个可以把本地 pulseaudio 声音广播到 web 的工具。
+
+== Install
+
+[,bash]
+----
+go install github.com/msqtt/listenme
+----
+
+or 
+
+[,bash]
+----
+$ git clone https://github.com/msqtt/listenme.git
+$ go build -o litenme .
+----
+
+== How2use
+
+直接执行二进制文件就行 💩
+
+[,bash]
+----
+$ listenme
+----
+
+执行程序后，会创建一个 pulseaudio client 和 http 服务器，client 监听声音传给 http 服务器广播。 
