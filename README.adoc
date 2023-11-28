@@ -5,7 +5,7 @@
 
 [,bash]
 ----
-go install github.com/msqtt/listenme
+go install github.com/msqtt/listenme@latest
 ----
 
 or 
