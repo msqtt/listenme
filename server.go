@@ -59,10 +59,10 @@ func readAudioChunk(sampleRate int, reader io.Reader) []byte {
 
 func serverStream(sampleRate int, reader io.Reader, passwd string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-    if r.URL.Query().Get("passwd") != passwd {
-      w.WriteHeader(http.StatusUnauthorized)
-      return
-    }
+		if r.URL.Query().Get("passwd") != passwd {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Println(err)
@@ -127,14 +127,14 @@ func startServer(sampleRate int, audio io.Reader, passwd string) {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		t, err := template.ParseFS(web, "web/index.html")
-      // ParseFiles("web/index.html")
+		// ParseFiles("web/index.html")
 		if err != nil {
 			log.Fatal(err)
 		}
 		pswd := r.URL.Query().Get("passwd")
-		t.Execute(w, pswd == passwd)
+		t.Execute(w, map[string]any{"auth": pswd == passwd, "sampleRate": sampleRate})
 	})
-  subWeb, _ := fs.Sub(web, "web")
+	subWeb, _ := fs.Sub(web, "web")
 	http.Handle("/js/", http.FileServer(http.FS(subWeb)))
 	http.HandleFunc("/listen", serverStream(sampleRate, audio, passwd))
 	log.Fatal(http.ListenAndServe(":"+serverPort, nil))

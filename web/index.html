@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
-  {{ if . }}
+  {{ if .auth }}
     <body>
       <h1>Kinda silly :D</h1> 
       <input type="range" max="1" value="0.5" min="0" id="range" onchange="changeVolume(event)" step="0.1"><br />
@@ -22,7 +22,7 @@
       let player = new PCMPlayer({
         inputCodec: 'Int32',
         channels: 2,
-        sampleRate: 96000,
+        sampleRate: {{ .sampleRate }},
         flushTime: 1000
       });
       ws = new WebSocket("ws://"+host+"/listen"+query);

@@ -29,9 +29,9 @@ $ listenme
 
 === Environment
 
-启动时指定密码和端口。
+启动时指定密码、端口以及采样率。
 
 [,bash]
 ----
-$ PASSWD=xxx PORT=1234 listenme
+$ PASSWD=xxx PORT=1234 SAMPLE=44100 listenme
 ----
