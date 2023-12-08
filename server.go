@@ -41,8 +41,8 @@ func dealWithMessage(host string, conn *websocket.Conn, ackCh, closeCh chan stru
 	}
 }
 
-func readAudioChunk(sampleRate int, reader io.Reader) []byte {
-	size := sampleRate << 1
+func readAudioChunk(sampleRate int, reader io.Reader) ([]byte, bool) {
+	size := sampleRate << 2
 	bytes := make([]byte, size)
 	idx := 0
 	for idx < size {
@@ -54,7 +54,12 @@ func readAudioChunk(sampleRate int, reader io.Reader) []byte {
 			log.Fatal(err)
 		}
 	}
-	return bytes[:idx]
+	for i := 0; i < idx; i++ {
+		if bytes[i] != 0 {
+			return bytes[:idx], true
+		}
+	}
+	return bytes[:idx], false
 }
 
 func serverStream(sampleRate int, reader io.Reader, passwd string) http.HandlerFunc {
@@ -72,8 +77,6 @@ func serverStream(sampleRate int, reader io.Reader, passwd string) http.HandlerF
 		userSet.lock.Lock()
 		userSet.set[conn] = struct{}{}
 		userSet.lock.Unlock()
-
-		// closeCh := make(chan struct{})
 
 		agent := strings.Join(r.Header["User-Agent"], " ")
 		log.Println(agent, "entering...")
@@ -104,9 +107,13 @@ func serverStream(sampleRate int, reader io.Reader, passwd string) http.HandlerF
 
 func audioServer(sampleRate int, audio io.Reader) {
 	for {
-		time.Sleep(150 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
+		b, ok := readAudioChunk(sampleRate, audio)
+		// if all bytes are zero, stop sending.
+		if !ok {
+			continue
+		}
 		userSet.lock.Lock()
-		b := readAudioChunk(sampleRate, audio)
 		for c := range userSet.set {
 			err := c.WriteMessage(websocket.BinaryMessage, b)
 			if err != nil {
