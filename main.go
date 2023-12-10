@@ -52,7 +52,6 @@ func main() {
 
 	sampleRate := 96000
 	sampleStr := os.Getenv("SAMPLE")
-  
 	if d, err := strconv.Atoi(sampleStr); err == nil && sampleStr != "" {
 		sampleRate = d
 	}
