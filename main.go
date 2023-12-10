@@ -80,7 +80,7 @@ func main() {
 	go startServer(sampleRate, &buf, passwd)
 
 	stream.Start()
-	log.Println("Press any key to stop...")
+	log.Println("Press enter to stop...")
 	os.Stdin.Read([]byte{0})
 	stream.Stop()
 }
