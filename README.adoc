@@ -16,6 +16,10 @@ $ git clone https://github.com/msqtt/listenme.git
 $ go build -o litenme .
 ----
 
+or using nix？
+
+the package file is [here](./default.nix)
+
 == How2use
 
 直接执行二进制文件就行 💩
